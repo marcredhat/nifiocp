@@ -1,0 +1,672 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:25Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: auth-conf-nifi-0
+    namespace: nifi
+    resourceVersion: "35471967"
+    uid: c01207e3-c732-4077-9de5-e9a0a1de5e67
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 100Mi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:26Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: auth-conf-nifi-1
+    namespace: nifi
+    resourceVersion: "35472056"
+    uid: 4be88174-eef0-43c9-896f-9de01060051f
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 100Mi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:27Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: auth-conf-nifi-2
+    namespace: nifi
+    resourceVersion: "35472094"
+    uid: 06b617a6-73db-4bc1-ac3c-0ea62c6a65bc
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 100Mi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:25Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: config-data-nifi-0
+    namespace: nifi
+    resourceVersion: "35471973"
+    uid: 2e532286-2244-40d8-8cfd-d98fe110887f
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 100Mi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:27Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: config-data-nifi-1
+    namespace: nifi
+    resourceVersion: "35472062"
+    uid: da4e010d-f937-4ac0-94f4-a3076e602565
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 100Mi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:27Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: config-data-nifi-2
+    namespace: nifi
+    resourceVersion: "35472096"
+    uid: dae3e036-c60a-40c6-bf4d-64c76fc990cc
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 100Mi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:25Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: content-repository-nifi-0
+    namespace: nifi
+    resourceVersion: "35471983"
+    uid: 54cd3fce-7e91-4d37-816d-6ad87b76abba
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:26Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: content-repository-nifi-1
+    namespace: nifi
+    resourceVersion: "35472029"
+    uid: 685b7934-eedd-4209-82b7-107e4da978b7
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:28Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: content-repository-nifi-2
+    namespace: nifi
+    resourceVersion: "35472106"
+    uid: 522e0206-85fe-4c06-84ed-f8ed1d1e4193
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:25Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: data-nifi-0
+    namespace: nifi
+    resourceVersion: "35471980"
+    uid: 5bd0944a-160c-4f83-bffa-aa4521e7f05d
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:27Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: data-nifi-1
+    namespace: nifi
+    resourceVersion: "35472067"
+    uid: 6a85ed1d-9e1a-4da7-a18e-c2678ff69d65
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:27Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: data-nifi-2
+    namespace: nifi
+    resourceVersion: "35472099"
+    uid: da69ab2f-1e10-4c61-ac40-e1fa91afba98
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:25Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app.kubernetes.io/component: zookeeper
+      app.kubernetes.io/instance: nifi
+      app.kubernetes.io/name: zookeeper
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: data-nifi-zookeeper-0
+    namespace: nifi
+    resourceVersion: "35471994"
+    uid: 79d9fbdd-af1f-4b6f-a16a-c87a589d019a
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 8Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:26Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app.kubernetes.io/component: zookeeper
+      app.kubernetes.io/instance: nifi
+      app.kubernetes.io/name: zookeeper
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: data-nifi-zookeeper-1
+    namespace: nifi
+    resourceVersion: "35472016"
+    uid: 9a3cacae-b774-40f4-8daf-1e56c932b51f
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 8Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:26Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app.kubernetes.io/component: zookeeper
+      app.kubernetes.io/instance: nifi
+      app.kubernetes.io/name: zookeeper
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: data-nifi-zookeeper-2
+    namespace: nifi
+    resourceVersion: "35472052"
+    uid: 69476343-95f4-410c-a441-6741d112b35d
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 8Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:25Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app.kubernetes.io/instance: nifi
+      app.kubernetes.io/name: registry
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: database-nifi-registry-0
+    namespace: nifi
+    resourceVersion: "35471976"
+    uid: 17965860-90ff-4a1c-b210-e688d5d301bb
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:25Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app.kubernetes.io/instance: nifi
+      app.kubernetes.io/name: registry
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: flow-storage-nifi-registry-0
+    namespace: nifi
+    resourceVersion: "35471981"
+    uid: 547dea77-7240-4542-922c-ddaf237a341e
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:25Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: flowfile-repository-nifi-0
+    namespace: nifi
+    resourceVersion: "35471982"
+    uid: 9621aa3d-0e18-4441-94d4-92235328ae41
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:26Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: flowfile-repository-nifi-1
+    namespace: nifi
+    resourceVersion: "35472026"
+    uid: 877dff6b-6550-49e7-881e-6f4fc9f5bdd9
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:28Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: flowfile-repository-nifi-2
+    namespace: nifi
+    resourceVersion: "35472104"
+    uid: d77b9cd8-4b49-4be2-aedd-57ff24534c63
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:25Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: logs-nifi-0
+    namespace: nifi
+    resourceVersion: "35471963"
+    uid: 79de80f0-966b-41ca-aa1c-01e62a37f016
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 5Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:26Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: logs-nifi-1
+    namespace: nifi
+    resourceVersion: "35472047"
+    uid: c58114a3-2140-43ff-a356-d3717e24dc5a
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 5Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:27Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: logs-nifi-2
+    namespace: nifi
+    resourceVersion: "35472091"
+    uid: 54c260e3-3964-4841-8399-223c70c499c3
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 5Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"labels":{"component.opendatahub.io/name":"nifi","opendatahub.io/component":"true"},"name":"nifi-ca","namespace":"nifi"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"1Gi"}},"storageClassName":"ocs-storagecluster-ceph-rbd"}}
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: openshift-storage.rbd.csi.ceph.com
+    creationTimestamp: "2022-09-24T18:32:54Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: nifi-ca
+    namespace: nifi
+    resourceVersion: "35676195"
+    uid: cf2d72b3-bbcc-49c2-a40d-cdd184171885
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+    volumeName: pvc-cf2d72b3-bbcc-49c2-a40d-cdd184171885
+  status:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 1Gi
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:25Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: provenance-repository-nifi-0
+    namespace: nifi
+    resourceVersion: "35471986"
+    uid: 0a754a35-1d64-4942-bd85-e8310fc16789
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:26Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: provenance-repository-nifi-1
+    namespace: nifi
+    resourceVersion: "35472041"
+    uid: eb4d8a42-ca28-4479-bc43-5d716538fdac
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    creationTimestamp: "2022-09-24T18:00:28Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: provenance-repository-nifi-2
+    namespace: nifi
+    resourceVersion: "35472112"
+    uid: 22ded87e-6749-4e7a-85b0-5b45ec572e1b
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+    storageClassName: ocs-storagecluster-ceph-rbd
+    volumeMode: Filesystem
+  status:
+    phase: Pending
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""

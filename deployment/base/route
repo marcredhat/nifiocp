@@ -1,0 +1,41 @@
+apiVersion: v1
+items:
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    annotations:
+      openshift.io/host.generated: "true"
+    creationTimestamp: "2022-09-24T22:45:24Z"
+    labels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+    name: nifi
+    namespace: nifi
+    resourceVersion: "35723100"
+    uid: 4a26b20c-3b46-4eac-b7fa-34376beb01e0
+  spec:
+    host: nifi-nifi.apps.laposte-ocp-47.kcloud.cloudera.com
+    port:
+      targetPort: 9443
+    tls:
+      termination: reencrypt
+    to:
+      kind: Service
+      name: nifi
+      weight: 100
+    wildcardPolicy: Subdomain
+  status:
+    ingress:
+    - conditions:
+      - lastTransitionTime: "2022-09-24T22:45:24Z"
+        status: "True"
+        type: Admitted
+      host: nifi-nifi.apps.laposte-ocp-47.kcloud.cloudera.com
+      routerCanonicalHostname: router-default.apps.laposte-ocp-47.kcloud.cloudera.com
+      routerName: default
+      wildcardPolicy: None
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""

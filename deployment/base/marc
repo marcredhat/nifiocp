@@ -1,0 +1,1790 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: ca-ca
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi-ca-sa
+  namespace: nifi
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: nifi
+    app.kubernetes.io/name: registry
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi-registry
+  namespace: nifi
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: nifi
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi-sa
+  namespace: nifi
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: route-create-role
+  namespace: nifi
+rules:
+- apiGroups:
+  - ""
+  - route.openshift.io
+  resources:
+  - routes
+  verbs:
+  - get
+  - create
+- apiGroups:
+  - ""
+  - route.openshift.io
+  resources:
+  - routes/custom-host
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: route-create-binding
+  namespace: nifi
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: route-create-role
+subjects:
+- kind: ServiceAccount
+  name: nifi-sa
+  namespace: nifi
+---
+apiVersion: v1
+data:
+  authorizers-empty.xml: |
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <authorizers>
+        <userGroupProvider>
+            <identifier>file-user-group-provider</identifier>
+            <class>org.apache.nifi.authorization.FileUserGroupProvider</class>
+            <property name="Users File">../data/users.xml</property>
+            <property name="Legacy Authorized Users File"></property>
+        </userGroupProvider>
+
+        <!-- To enable the ldap-user-group-provider remove 2 lines. This is 1 of 2.
+        <userGroupProvider>
+            <identifier>ldap-user-group-provider</identifier>
+            <class>org.apache.nifi.ldap.tenants.LdapUserGroupProvider</class>
+            <property name="Authentication Strategy">START_TLS</property>
+            <property name="Manager DN"></property>
+            <property name="Manager Password"></property>
+            <property name="TLS - Keystore"></property>
+            <property name="TLS - Keystore Password"></property>
+            <property name="TLS - Keystore Type"></property>
+            <property name="TLS - Truststore"></property>
+            <property name="TLS - Truststore Password"></property>
+            <property name="TLS - Truststore Type"></property>
+            <property name="TLS - Client Auth"></property>
+            <property name="TLS - Protocol"></property>
+            <property name="TLS - Shutdown Gracefully"></property>
+            <property name="Referral Strategy">FOLLOW</property>
+            <property name="Connect Timeout">10 secs</property>
+            <property name="Read Timeout">10 secs</property>
+            <property name="Url"></property>
+            <property name="Page Size"></property>
+            <property name="Sync Interval">30 mins</property>
+            <property name="User Search Base"></property>
+            <property name="User Object Class">person</property>
+            <property name="User Search Scope">ONE_LEVEL</property>
+            <property name="User Search Filter"></property>
+            <property name="User Identity Attribute"></property>
+            <property name="User Group Name Attribute"></property>
+            <property name="User Group Name Attribute - Referenced Group Attribute"></property>
+            <property name="Group Search Base"></property>
+            <property name="Group Object Class">group</property>
+            <property name="Group Search Scope">ONE_LEVEL</property>
+            <property name="Group Search Filter"></property>
+            <property name="Group Name Attribute"></property>
+            <property name="Group Member Attribute"></property>
+            <property name="Group Member Attribute - Referenced User Attribute"></property>
+        </userGroupProvider>
+        To enable the ldap-user-group-provider remove 2 lines. This is 2 of 2. -->
+
+        <!-- To enable the composite-user-group-provider remove 2 lines. This is 1 of 2.
+        <userGroupProvider>
+            <identifier>composite-user-group-provider</identifier>
+            <class>org.apache.nifi.authorization.CompositeUserGroupProvider</class>
+            <property name="User Group Provider 1"></property>
+        </userGroupProvider>
+        To enable the composite-user-group-provider remove 2 lines. This is 2 of 2. -->
+
+        <!-- To enable the composite-configurable-user-group-provider remove 2 lines. This is 1 of 2.
+        <userGroupProvider>
+            <identifier>composite-configurable-user-group-provider</identifier>
+            <class>org.apache.nifi.authorization.CompositeConfigurableUserGroupProvider</class>
+            <property name="Configurable User Group Provider">file-user-group-provider</property>
+            <property name="User Group Provider 1"></property>
+        </userGroupProvider>
+        To enable the composite-configurable-user-group-provider remove 2 lines. This is 2 of 2. -->
+
+        <accessPolicyProvider>
+            <identifier>file-access-policy-provider</identifier>
+            <class>org.apache.nifi.authorization.FileAccessPolicyProvider</class>
+            <property name="User Group Provider">file-user-group-provider</property>
+            <property name="Authorizations File">../data/authorizations.xml</property>
+        </accessPolicyProvider>
+
+        <authorizer>
+            <identifier>managed-authorizer</identifier>
+            <class>org.apache.nifi.authorization.StandardManagedAuthorizer</class>
+            <property name="Access Policy Provider">file-access-policy-provider</property>
+        </authorizer>
+
+        <authorizer>
+            <identifier>file-provider</identifier>
+            <class>org.apache.nifi.authorization.FileAuthorizer</class>
+            <property name="Authorizations File">./conf/authorizations.xml</property>
+            <property name="Users File">./conf/users.xml</property>
+            <property name="Initial Admin Identity"></property>
+            <property name="Legacy Authorized Users File"></property>
+            <property name="Node Identity 1"></property>
+        </authorizer>
+    </authorizers>
+  authorizers.xml: |
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?> <authorizers>
+        <userGroupProvider>
+            <identifier>file-user-group-provider</identifier>
+            <class>org.apache.nifi.authorization.FileUserGroupProvider</class>
+            <property name="Users File">./auth-conf/users.xml</property>
+            <property name="Legacy Authorized Users File"></property>
+            <property name="Initial User Identity 0">CN=nifi-0.nifi-headless.nifi.svc.cluster.local, OU=NIFI</property>
+            <property name="Initial User Identity 1">CN=nifi-1.nifi-headless.nifi.svc.cluster.local, OU=NIFI</property>
+            <property name="Initial User Identity 2">CN=nifi-2.nifi-headless.nifi.svc.cluster.local, OU=NIFI</property>
+            <property name="Initial User Identity 3">CN=nifi-3.nifi-headless.nifi.svc.cluster.local, OU=NIFI</property>
+            <property name="Initial User Identity 4">CN=nifi-4.nifi-headless.nifi.svc.cluster.local, OU=NIFI</property>
+            <property name="Initial User Identity admin">admin</property>
+        </userGroupProvider>
+
+        <userGroupProvider>
+            <identifier>composite-configurable-user-group-provider</identifier>
+            <class>org.apache.nifi.authorization.CompositeConfigurableUserGroupProvider</class>
+            <property name="Configurable User Group Provider">file-user-group-provider</property>
+        </userGroupProvider>
+
+        <accessPolicyProvider>
+            <identifier>file-access-policy-provider</identifier>
+            <class>org.apache.nifi.authorization.FileAccessPolicyProvider</class>
+            <property name="User Group Provider">composite-configurable-user-group-provider</property>
+            <property name="Authorizations File">./auth-conf/authorizations.xml</property>
+            <property name="Initial Admin Identity">admin</property>
+            <property name="Legacy Authorized Users File"></property>
+            <property name="Node Identity 0">CN=nifi-0.nifi-headless.nifi.svc.cluster.local, OU=NIFI</property>
+            <property name="Node Identity 1">CN=nifi-1.nifi-headless.nifi.svc.cluster.local, OU=NIFI</property>
+            <property name="Node Identity 2">CN=nifi-2.nifi-headless.nifi.svc.cluster.local, OU=NIFI</property>
+            <property name="Node Identity 3">CN=nifi-3.nifi-headless.nifi.svc.cluster.local, OU=NIFI</property>
+            <property name="Node Identity 4">CN=nifi-4.nifi-headless.nifi.svc.cluster.local, OU=NIFI</property>
+        </accessPolicyProvider>
+
+        <authorizer>
+            <identifier>managed-authorizer</identifier>
+            <class>org.apache.nifi.authorization.StandardManagedAuthorizer</class>
+            <property name="Access Policy Provider">file-access-policy-provider</property>
+        </authorizer>
+
+    </authorizers>
+  bootstrap-notification-services.xml: |
+    <?xml version="1.0"?>
+    <services>
+
+    <!--
+        <service>
+            <id>email-notification</id>
+            <class>org.apache.nifi.bootstrap.notification.email.EmailNotificationService</class>
+            <property name="SMTP Hostname"></property>
+            <property name="SMTP Port"></property>
+            <property name="SMTP Username"></property>
+            <property name="SMTP Password"></property>
+            <property name="SMTP TLS"></property>
+            <property name="From"></property>
+            <property name="To"></property>
+        </service>
+    -->
+    <!--
+        <service>
+            <id>http-notification</id>
+            <class>org.apache.nifi.bootstrap.notification.http.HttpNotificationService</class>
+            <property name="URL"></property>
+        </service>
+    -->
+    </services>
+  bootstrap.conf: |+
+    #
+    # Licensed to the Apache Software Foundation (ASF) under one or more
+    # contributor license agreements.  See the NOTICE file distributed with
+    # this work for additional information regarding copyright ownership.
+    # The ASF licenses this file to You under the Apache License, Version 2.0
+    # (the "License"); you may not use this file except in compliance with
+    # the License.  You may obtain a copy of the License at
+    #
+    #   http://www.apache.org/licenses/LICENSE-2.0
+    #
+    # Unless required by applicable law or agreed to in writing, software
+    # distributed under the License is distributed on an "AS IS" BASIS,
+    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    # See the License for the specific language governing permissions and
+    # limitations under the License.
+    #
+
+    # Java command to use when running NiFi
+    java=java
+
+    # Username to use when running NiFi. This value will be ignored on Windows.
+    run.as=
+
+    # Configure where NiFi's lib and conf directories live
+    lib.dir=./lib
+    conf.dir=./conf
+
+    # How long to wait after telling NiFi to shutdown before explicitly killing the Process
+    graceful.shutdown.seconds=20
+
+    # Disable JSR 199 so that we can use JSP's without running a JDK
+    java.arg.1=-Dorg.apache.jasper.compiler.disablejsr199=true
+
+    # JVM memory settings
+    java.arg.2=-Xms2g
+    java.arg.3=-Xmx2g
+
+    # Enable Remote Debugging
+    #java.arg.debug=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000
+
+    java.arg.4=-Djava.net.preferIPv4Stack=true
+
+    # allowRestrictedHeaders is required for Cluster/Node communications to work properly
+    java.arg.5=-Dsun.net.http.allowRestrictedHeaders=true
+    java.arg.6=-Djava.protocol.handler.pkgs=sun.net.www.protocol
+
+    # The G1GC is still considered experimental but has proven to be very advantageous in providing great
+    # performance without significant "stop-the-world" delays.
+    #java.arg.13=-XX:+UseG1GC
+
+    #Set headless mode by default
+    java.arg.14=-Djava.awt.headless=true
+
+    # Master key in hexadecimal format for encrypted sensitive configuration values
+    nifi.bootstrap.sensitive.key=
+
+    # Sets the provider of SecureRandom to /dev/urandom to prevent blocking on VMs
+    java.arg.15=-Djava.security.egd=file:/dev/urandom
+
+    ###
+    # Notification Services for notifying interested parties when NiFi is stopped, started, dies
+    ###
+
+    # XML File that contains the definitions of the notification services
+    notification.services.file=./conf/bootstrap-notification-services.xml
+
+    # In the case that we are unable to send a notification for an event, how many times should we retry?
+    notification.max.attempts=5
+
+    # Comma-separated list of identifiers that are present in the notification.services.file; which services should be used to notify when NiFi is started?
+    #nifi.start.notification.services=email-notification
+
+    # Comma-separated list of identifiers that are present in the notification.services.file; which services should be used to notify when NiFi is stopped?
+    #nifi.stop.notification.services=email-notification
+
+    # Comma-separated list of identifiers that are present in the notification.services.file; which services should be used to notify when NiFi dies?
+    #nifi.dead.notification.services=email-notification
+
+
+  flow.xml: |
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <flowController encoding-version="1.3">
+        <maxTimerDrivenThreadCount>10</maxTimerDrivenThreadCount>
+        <maxEventDrivenThreadCount>5</maxEventDrivenThreadCount>
+        <registries>
+            <flowRegistry>
+                <id>3abd9dad-79c2-49a5-acac-3a4434600d44</id>
+                <name>default</name>
+                <url>http://nifi-registry:18080</url>
+                <description/>
+            </flowRegistry>
+        </registries>
+        <rootGroup>
+            <id>3abd9dad-79c2-49a5-acac-3a4434600d44</id>
+            <name>Nifi Flow</name>
+            <position x="0.0" y="0.0"/>
+            <comment/>
+        </rootGroup>
+        <controllerServices/>
+        <reportingTasks/>
+    </flowController>
+  login-identity-providers.xml: |
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <loginIdentityProviders>
+        <provider>
+            <identifier>single-user-provider</identifier>
+            <class>org.apache.nifi.authentication.single.user.SingleUserLoginIdentityProvider</class>
+            <property name="Username"/>
+            <property name="Password"/>
+        </provider>
+    </loginIdentityProviders>
+  nifi.properties: |
+    # Licensed to the Apache Software Foundation (ASF) under one or more
+    # contributor license agreements.  See the NOTICE file distributed with
+    # this work for additional information regarding copyright ownership.
+    # The ASF licenses this file to You under the Apache License, Version 2.0
+    # (the "License"); you may not use this file except in compliance with
+    # the License.  You may obtain a copy of the License at
+    #
+    #     http://www.apache.org/licenses/LICENSE-2.0
+    #
+    # Unless required by applicable law or agreed to in writing, software
+    # distributed under the License is distributed on an "AS IS" BASIS,
+    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    # See the License for the specific language governing permissions and
+    # limitations under the License.
+
+    # Core Properties #
+    nifi.flow.configuration.file=../data/flow.xml.gz
+    nifi.flow.configuration.archive.enabled=true
+    nifi.flow.configuration.archive.dir=../data/archive/
+    nifi.flow.configuration.archive.max.time=30 days
+    nifi.flow.configuration.archive.max.storage=500 MB
+    nifi.flow.configuration.archive.max.count=
+    nifi.flowcontroller.autoResumeState=true
+    nifi.flowcontroller.graceful.shutdown.period=10 sec
+    nifi.flowservice.writedelay.interval=500 ms
+    nifi.administrative.yield.duration=30 sec
+    # If a component has no work to do (is "bored"), how long should we wait before checking again for work?
+    nifi.bored.yield.duration=10 millis
+    nifi.queue.backpressure.count=10000
+    nifi.queue.backpressure.size=1 GB
+
+    nifi.authorizer.configuration.file=./conf/authorizers.xml
+    nifi.login.identity.provider.configuration.file=./conf/login-identity-providers.xml
+    nifi.templates.directory=../data/templates
+    nifi.ui.banner.text=
+    nifi.ui.autorefresh.interval=30 sec
+    nifi.nar.library.directory=./lib
+    nifi.nar.library.directory.custom=
+    nifi.nar.library.autoload.directory=./extensions
+    nifi.nar.working.directory=./work/nar/
+    nifi.documentation.working.directory=./work/docs/components
+
+    ####################
+    # State Management #
+    ####################
+    nifi.state.management.configuration.file=./conf/state-management.xml
+    # The ID of the local state provider
+    nifi.state.management.provider.local=local-provider
+    # The ID of the cluster-wide state provider. This will be ignored if NiFi is not clustered but must be populated if running in a cluster.
+    nifi.state.management.provider.cluster=zk-provider
+    # Specifies whether or not this instance of NiFi should run an embedded ZooKeeper server
+    nifi.state.management.embedded.zookeeper.start=false
+    # Properties file that provides the ZooKeeper properties to use if <nifi.state.management.embedded.zookeeper.start> is set to true
+    nifi.state.management.embedded.zookeeper.properties=./conf/zookeeper.properties
+
+
+    # H2 Settings
+    nifi.database.directory=../data/database_repository
+    nifi.h2.url.append=;LOCK_TIMEOUT=25000;WRITE_DELAY=0;AUTO_SERVER=FALSE
+
+    # FlowFile Repository
+    nifi.flowfile.repository.implementation=org.apache.nifi.controller.repository.WriteAheadFlowFileRepository
+    nifi.flowfile.repository.wal.implementation=org.apache.nifi.wali.SequentialAccessWriteAheadLog
+    nifi.flowfile.repository.directory=../flowfile_repository
+    nifi.flowfile.repository.partitions=256
+    nifi.flowfile.repository.checkpoint.interval=2 mins
+    nifi.flowfile.repository.always.sync=false
+    nifi.flowfile.repository.encryption.key.provider.implementation=
+    nifi.flowfile.repository.encryption.key.provider.location=
+    nifi.flowfile.repository.encryption.key.provider.password=
+    nifi.flowfile.repository.encryption.key.id=
+    nifi.flowfile.repository.encryption.key=
+    nifi.flowfile.repository.retain.orphaned.flowfiles=true
+
+    nifi.swap.manager.implementation=org.apache.nifi.controller.FileSystemSwapManager
+    nifi.queue.swap.threshold=20000
+    nifi.swap.in.period=5 sec
+    nifi.swap.in.threads=1
+    nifi.swap.out.period=5 sec
+    nifi.swap.out.threads=4
+
+    # Content Repository
+    nifi.content.repository.implementation=org.apache.nifi.controller.repository.FileSystemRepository
+    nifi.content.claim.max.appendable.size=1 MB
+    nifi.content.claim.max.flow.files=100
+    nifi.content.repository.directory.default=../content_repository
+    nifi.content.repository.archive.max.retention.period=3 days
+    nifi.content.repository.archive.max.usage.percentage=85%
+    nifi.content.repository.archive.enabled=true
+    nifi.content.repository.always.sync=false
+    nifi.content.viewer.url=/nifi-content-viewer/
+    nifi.content.repository.encryption.key.provider.implementation=
+    nifi.content.repository.encryption.key.provider.location=
+    nifi.content.repository.encryption.key.provider.password=
+    nifi.content.repository.encryption.key.id=
+    nifi.content.repository.encryption.key=
+
+    # Provenance Repository Properties
+    nifi.provenance.repository.implementation=org.apache.nifi.provenance.WriteAheadProvenanceRepository
+    nifi.provenance.repository.debug.frequency=1_000_000
+    nifi.provenance.repository.encryption.key.provider.implementation=
+    nifi.provenance.repository.encryption.key.provider.location=
+    nifi.provenance.repository.encryption.key.id=
+    nifi.provenance.repository.encryption.key=
+
+    # Persistent Provenance Repository Properties
+    nifi.provenance.repository.directory.default=../provenance_repository
+    nifi.provenance.repository.max.storage.time=10 days
+    nifi.provenance.repository.max.storage.size=8 GB
+    nifi.provenance.repository.rollover.time=30 secs
+    nifi.provenance.repository.rollover.size=100 MB
+    nifi.provenance.repository.query.threads=2
+    nifi.provenance.repository.index.threads=2
+    nifi.provenance.repository.compress.on.rollover=true
+    nifi.provenance.repository.always.sync=false
+    nifi.provenance.repository.journal.count=16
+    # Comma-separated list of fields. Fields that are not indexed will not be searchable. Valid fields are:
+    # EventType, FlowFileUUID, Filename, TransitURI, ProcessorID, AlternateIdentifierURI, Relationship, Details
+    nifi.provenance.repository.indexed.fields=EventType, FlowFileUUID, Filename, ProcessorID, Relationship
+    # FlowFile Attributes that should be indexed and made searchable.  Some examples to consider are filename, uuid, mime.type
+    nifi.provenance.repository.indexed.attributes=
+    # Large values for the shard size will result in more Java heap usage when searching the Provenance Repository
+    # but should provide better performance
+    nifi.provenance.repository.index.shard.size=500 MB
+    # Indicates the maximum length that a FlowFile attribute can be when retrieving a Provenance Event from
+    # the repository. If the length of any attribute exceeds this value, it will be truncated when the event is retrieved.
+    nifi.provenance.repository.max.attribute.length=65536
+
+    # Volatile Provenance Respository Properties
+    nifi.provenance.repository.buffer.size=100000
+
+    # Component Status Repository
+    nifi.components.status.repository.implementation=org.apache.nifi.controller.status.history.VolatileComponentStatusRepository
+    nifi.components.status.repository.buffer.size=1440
+    nifi.components.status.snapshot.frequency=1 min
+
+    # Site to Site properties
+    nifi.remote.input.host=
+    nifi.remote.input.secure=true
+    nifi.remote.input.socket.port=10000
+    nifi.remote.input.http.enabled=true
+    nifi.remote.input.http.transaction.ttl=30 sec
+    nifi.remote.contents.cache.expiration=30 secs
+
+    # web properties #
+    #############################################
+
+    # For security, NiFi will present the UI on 127.0.0.1 and only be accessible through this loopback interface.
+    # Be aware that changing these properties may affect how your instance can be accessed without any restriction.
+    # We recommend configuring HTTPS instead. The administrators guide provides instructions on how to do this.
+
+    nifi.web.war.directory=./lib
+    nifi.web.proxy.host=
+
+    nifi.web.http.port=
+    nifi.web.https.port=9443
+
+    nifi.web.http.host=
+    nifi.web.http.network.interface.default=
+    nifi.web.https.host=
+    nifi.web.https.network.interface.default=
+    nifi.web.jetty.working.directory=./work/jetty
+    nifi.web.jetty.threads=200
+    # nifi.web.proxy.context.path=
+
+    # security properties #
+    nifi.sensitive.props.key=
+    nifi.sensitive.props.key.protected=
+    nifi.sensitive.props.algorithm=PBEWITHMD5AND256BITAES-CBC-OPENSSL
+    nifi.sensitive.props.provider=BC
+    nifi.sensitive.props.additional.keys=
+
+    nifi.security.keystore=
+    nifi.security.keystoreType=jks
+    nifi.security.keystorePasswd=env:PASS
+    nifi.security.keyPasswd=env:PASS
+    nifi.security.truststore=
+    nifi.security.truststoreType=jks
+    nifi.security.truststorePasswd=env:PASS
+    proxiedEntity=admin
+    nifi.security.user.authorizer=managed-authorizer
+    nifi.security.needClientAuth=true
+
+
+    nifi.security.user.login.identity.provider=single-user-provider
+
+    nifi.security.ocsp.responder.url=
+    nifi.security.ocsp.responder.certificate=
+
+    # OpenId Connect SSO Properties #
+    nifi.security.user.oidc.discovery.url=
+    nifi.security.user.oidc.connect.timeout=5s
+    nifi.security.user.oidc.read.timeout=5s
+    nifi.security.user.oidc.client.id=
+    nifi.security.user.oidc.client.secret=
+    nifi.security.user.oidc.preferred.jwsalgorithm=
+    nifi.security.user.oidc.claim.identifying.user=
+    nifi.security.user.oidc.additional.scopes=
+
+    # Apache Knox SSO Properties #
+    nifi.security.user.knox.url=
+    nifi.security.user.knox.publicKey=
+    nifi.security.user.knox.cookieName=hadoop-jwt
+    nifi.security.user.knox.audiences=
+
+    # Identity Mapping Properties #
+    # These properties allow normalizing user identities such that identities coming from different identity providers
+    # (certificates, LDAP, Kerberos) can be treated the same internally in NiFi. The following example demonstrates normalizing
+    # DNs from certificates and principals from Kerberos into a common identity string:
+    #
+    nifi.security.identity.mapping.pattern.dn=^CN=(.*?), OU=(.*?)
+    nifi.security.identity.mapping.value.dn=$1@$2
+    nifi.security.identity.mapping.pattern.dn2=^uid=(.*?),cn=(.*?),cn=(.*?),dc=(.*?),dc=(.*?)
+    nifi.security.identity.mapping.value.dn2=$1
+    # nifi.security.identity.mapping.pattern.kerb=^(.*?)/instance@(.*?)$
+    # nifi.security.identity.mapping.value.kerb=$1@$2
+
+    # cluster common properties (all nodes must have same values) #
+    nifi.cluster.protocol.heartbeat.interval=5 sec
+    nifi.cluster.protocol.is.secure=true
+
+    # cluster node properties (only configure for cluster nodes) #
+    nifi.cluster.is.node=true
+    nifi.cluster.node.address=
+    nifi.cluster.node.protocol.port=6007
+    nifi.cluster.node.protocol.threads=10
+    nifi.cluster.node.protocol.max.threads=50
+    nifi.cluster.node.event.history.size=25
+    nifi.cluster.node.connection.timeout=5 sec
+    nifi.cluster.node.read.timeout=5 sec
+    nifi.cluster.node.max.concurrent.requests=100
+    nifi.cluster.firewall.file=
+    nifi.cluster.flow.election.max.wait.time=1 mins
+    nifi.cluster.flow.election.max.candidates=3
+
+    # zookeeper properties, used for cluster management #
+    nifi.zookeeper.connect.string=
+    nifi.zookeeper.connect.timeout=3 secs
+    nifi.zookeeper.session.timeout=3 secs
+    nifi.zookeeper.root.node=/nifi
+
+    # Zookeeper properties for the authentication scheme used when creating acls on znodes used for cluster management
+    # Values supported for nifi.zookeeper.auth.type are "default", which will apply world/anyone rights on znodes
+    # and "sasl" which will give rights to the sasl/kerberos identity used to authenticate the nifi node
+    # The identity is determined using the value in nifi.kerberos.service.principal and the removeHostFromPrincipal
+    # and removeRealmFromPrincipal values (which should align with the kerberos.removeHostFromPrincipal and kerberos.removeRealmFromPrincipal
+    # values configured on the zookeeper server).
+    nifi.zookeeper.auth.type=
+    nifi.zookeeper.kerberos.removeHostFromPrincipal=
+    nifi.zookeeper.kerberos.removeRealmFromPrincipal=
+
+    # kerberos #
+    nifi.kerberos.krb5.file=
+
+    # kerberos service principal #
+    nifi.kerberos.service.principal=
+    nifi.kerberos.service.keytab.location=
+
+    # kerberos spnego principal #
+    nifi.kerberos.spnego.principal=
+    nifi.kerberos.spnego.keytab.location=
+    nifi.kerberos.spnego.authentication.expiration=12 hours
+
+    # external properties files for variable registry
+    # supports a comma delimited list of file locations
+    nifi.variable.registry.properties=
+  state-management.xml: |
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <stateManagement>
+        <local-provider>
+            <id>local-provider</id>
+            <class>org.apache.nifi.controller.state.providers.local.WriteAheadLocalStateProvider</class>
+            <property name="Directory">../data/state/local</property>
+            <property name="Always Sync">false</property>
+            <property name="Partitions">16</property>
+            <property name="Checkpoint Interval">2 mins</property>
+        </local-provider>
+        <cluster-provider>
+            <id>zk-provider</id>
+            <class>org.apache.nifi.controller.state.providers.zookeeper.ZooKeeperStateProvider</class>
+            <property name="Connect String">nifi-zookeeper:2181</property>
+            <property name="Root Node">/nifi</property>
+            <property name="Session Timeout">10 seconds</property>
+            <property name="Access Control">Open</property>
+        </cluster-provider>
+    </stateManagement>
+  zookeeper.properties: |
+    #
+    #
+    # Licensed to the Apache Software Foundation (ASF) under one
+    # or more contributor license agreements.  See the NOTICE file
+    # distributed with this work for additional information
+    # regarding copyright ownership.  The ASF licenses this file
+    # to you under the Apache License, Version 2.0 (the
+    # "License"); you may not use this file except in compliance
+    # with the License.  You may obtain a copy of the License at
+    #
+    #   http://www.apache.org/licenses/LICENSE-2.0
+    #
+    # Unless required by applicable law or agreed to in writing,
+    # software distributed under the License is distributed on an
+    # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    # KIND, either express or implied.  See the License for the
+    # specific language governing permissions and limitations
+    # under the License.
+    #
+    #
+    #
+
+    initLimit=10
+    autopurge.purgeInterval=24
+    syncLimit=5
+    tickTime=2000
+    dataDir=./state/zookeeper
+    autopurge.snapRetainCount=30
+
+    #
+    # Specifies the servers that are part of this zookeeper ensemble. For
+    # every NiFi instance running an embedded zookeeper, there needs to be
+    # a server entry below. For instance:
+    #
+    # server.1=nifi-node1-hostname:2888:3888;2181
+    # server.2=nifi-node2-hostname:2888:3888;2181
+    # server.3=nifi-node3-hostname:2888:3888;2181
+    #
+    # The index of the server corresponds to the myid file that gets created
+    # in the dataDir of each node running an embedded zookeeper. See the
+    # administration guide for more details.
+    #
+
+    server.1=
+kind: ConfigMap
+metadata:
+  labels:
+    app: nifi
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi-config
+  namespace: nifi
+---
+apiVersion: v1
+data:
+  admin_identity: admin
+  admin_password: 12CharacterOrPlus
+  certificate_store_password: trustmaster
+  ldap_admin: ""
+  ldap_host: ""
+  ldap_pass: ""
+  ldap_searchBase: ""
+  ldap_searchFilter: ""
+  ldap_userIdentityAttribute: ""
+  ldap_userIdentityMapping: ""
+  nodes_number: "3"
+  oidc_claim_identifying_user: ""
+  oidc_client_id: ""
+  oidc_client_secret: ""
+  oidc_discovery_url: ""
+  storage_class: ocs-storagecluster-ceph-rbd
+  uid: 3abd9dad-79c2-49a5-acac-3a4434600d44
+kind: ConfigMap
+metadata:
+  labels:
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi-parameters
+  namespace: nifi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nifi
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi
+  namespace: nifi
+spec:
+  ports:
+  - name: https
+    port: 9443
+    targetPort: 9443
+  selector:
+    app: nifi
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ca-ca
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi-ca
+  namespace: nifi
+spec:
+  ports:
+  - name: ca-server
+    port: 9090
+    targetPort: 9090
+  selector:
+    app: ca-ca
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+  labels:
+    app: nifi
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi-headless
+  namespace: nifi
+spec:
+  clusterIP: None
+  ports:
+  - name: http
+    port: 8443
+  - name: cluster
+    port: 6007
+  selector:
+    app: nifi
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nifi
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi-metrics
+  namespace: nifi
+spec:
+  ports:
+  - name: metrics
+    port: 9092
+    protocol: TCP
+    targetPort: metrics
+  selector:
+    app: nifi
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: nifi
+    app.kubernetes.io/name: registry
+    app.kubernetes.io/version: 1.15.2
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi-registry
+  namespace: nifi
+spec:
+  ports:
+  - name: http
+    port: 18080
+    targetPort: 18080
+  selector:
+    app.kubernetes.io/instance: nifi
+    app.kubernetes.io/name: registry
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: zookeeper
+    app.kubernetes.io/instance: nifi
+    app.kubernetes.io/name: zookeeper
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi-zookeeper
+  namespace: nifi
+spec:
+  ports:
+  - name: tcp-client
+    port: 2181
+    targetPort: client
+  - name: follower
+    port: 2888
+    targetPort: follower
+  - name: tcp-election
+    port: 3888
+    targetPort: election
+  selector:
+    app.kubernetes.io/component: zookeeper
+    app.kubernetes.io/instance: nifi
+    app.kubernetes.io/name: zookeeper
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: zookeeper
+    app.kubernetes.io/instance: nifi
+    app.kubernetes.io/name: zookeeper
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi-zookeeper-headless
+  namespace: nifi
+spec:
+  clusterIP: None
+  ports:
+  - name: tcp-client
+    port: 2181
+    targetPort: client
+  - name: follower
+    port: 2888
+    targetPort: follower
+  - name: tcp-election
+    port: 3888
+    targetPort: election
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/component: zookeeper
+    app.kubernetes.io/instance: nifi
+    app.kubernetes.io/name: zookeeper
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi-ca
+  namespace: nifi
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: ocs-storagecluster-ceph-rbd
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ca-ca
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi-ca
+  namespace: nifi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ca-ca
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+  template:
+    metadata:
+      labels:
+        app: ca-ca
+        component.opendatahub.io/name: nifi
+        opendatahub.io/component: "true"
+    spec:
+      containers:
+      - command:
+        - sh
+        - -c
+        - |
+          if [ -f config.json ]; then
+            OPTIONS="--configJson config.json --useConfigJson"
+          fi
+          exec ${NIFI_TOOLKIT_HOME}/bin/tls-toolkit.sh server -c "nifi-ca" -t sixteenCharacters -p 9090 ${OPTIONS}
+        image: quay.io/rh-data-services/nifi-toolkit-openshift:1.16.2
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          initialDelaySeconds: 90
+          periodSeconds: 60
+          tcpSocket:
+            port: 9090
+        name: ca
+        ports:
+        - containerPort: 9090
+        resources:
+          requests:
+            cpu: "0.1"
+            memory: 250Mi
+        volumeMounts:
+        - mountPath: /ca
+          name: nifi-ca
+          subPath: ca
+        workingDir: /ca
+      securityContext: {}
+      serviceAccountName: nifi-ca-sa
+      terminationGracePeriodSeconds: 0
+      volumes:
+      - name: nifi-ca
+        persistentVolumeClaim:
+          claimName: nifi-ca
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: nifi
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi
+  namespace: nifi
+spec:
+  podManagementPolicy: Parallel
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nifi
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+  serviceName: nifi-headless
+  template:
+    metadata:
+      labels:
+        app: nifi
+        component.opendatahub.io/name: nifi
+        opendatahub.io/component: "true"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - nifi
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      containers:
+      - command:
+        - bash
+        - -ce
+        - |
+          set -x
+          scripts_dir='/opt/nifi/scripts'
+
+          prop_replace () {
+            target_file=${NIFI_HOME}/conf/${3:-nifi.properties}
+            echo "updating ${1} in ${target_file}"
+            if egrep "^${1}=" ${target_file} &> /dev/null; then
+              sed -i -e "s|^$1=.*$|$1=$2|"  ${target_file}
+            else
+              echo ${1}=${2} >> ${target_file}
+            fi
+          }
+
+          mkdir -p ${NIFI_HOME}/config-data/conf
+          FQDN=$(hostname -f)
+
+          cat "${NIFI_HOME}/conf/nifi.temp" > "${NIFI_HOME}/conf/nifi.properties"
+
+          if [[ $(grep $(hostname) conf/authorizers.temp) ]]; then
+            cat "${NIFI_HOME}/conf/authorizers.temp" > "${NIFI_HOME}/conf/authorizers.xml"
+          else
+            cat "${NIFI_HOME}/conf/authorizers.empty" > "${NIFI_HOME}/conf/authorizers.xml"
+          fi
+
+          if ! test -f ${NIFI_HOME}/conf/login-identity-providers.xml; then
+            cat "${NIFI_HOME}/conf/login-identity-providers.temp" > "${NIFI_HOME}/conf/login-identity-providers.xml"
+          fi
+
+          if ! test -f /opt/nifi/data/flow.xml.gz && test -f /opt/nifi/data/flow.xml; then
+            gzip /opt/nifi/data/flow.xml
+          fi
+
+          prop_replace nifi.remote.input.host ${FQDN}
+          prop_replace nifi.cluster.node.address ${FQDN}
+          prop_replace nifi.zookeeper.connect.string ${NIFI_ZOOKEEPER_CONNECT_STRING}
+          prop_replace nifi.web.http.host ${FQDN}
+
+          # Update nifi.properties for security properties
+          prop_replace nifi.web.https.host ${FQDN}
+          prop_replace nifi.security.keystoreType jks
+          prop_replace nifi.security.keystore ${NIFI_HOME}/config-data/certs/keystore.jks
+          prop_replace nifi.security.keystorePasswd $(jq -r .keyStorePassword ${NIFI_HOME}/config-data/certs/config.json)
+          prop_replace nifi.security.keyPasswd $(jq -r .keyPassword ${NIFI_HOME}/config-data/certs/config.json)
+          prop_replace nifi.security.truststoreType jks
+          prop_replace nifi.security.truststore ${NIFI_HOME}/config-data/certs/truststore.jks
+          prop_replace nifi.security.truststorePasswd $(jq -r .trustStorePassword ${NIFI_HOME}/config-data/certs/config.json)
+          prop_replace nifi.web.http.network.interface.default "eth0" nifi.properties
+          prop_replace nifi.web.http.network.interface.lo "lo" nifi.properties
+          prop_replace nifi.web.proxy.host $(cat /opt/nifi/hostconf/hostname)
+
+          if [ -n "${NIFI_SENSITIVE_PROPS_KEY}" ]; then
+              prop_replace 'nifi.sensitive.props.key' "${NIFI_SENSITIVE_PROPS_KEY}"
+          fi
+
+          bin/nifi.sh set-single-user-credentials admin 12CharacterOrPlus
+
+          exec bin/nifi.sh run & nifi_pid="$!"
+
+          function offloadNode() {
+              FQDN=$(hostname -f)
+              echo "disconnecting node '$FQDN'"
+              baseUrl=https://${FQDN}:
+
+              keystore=${NIFI_HOME}/config-data/certs/keystore.jks
+              keystorePasswd=$(jq -r .keyStorePassword ${NIFI_HOME}/config-data/certs/config.json)
+              keyPasswd=$(jq -r .keyPassword ${NIFI_HOME}/config-data/certs/config.json)
+              truststore=${NIFI_HOME}/config-data/certs/truststore.jks
+              truststorePasswd=$(jq -r .trustStorePassword ${NIFI_HOME}/config-data/certs/config.json)
+
+              secureArgs=" --truststore ${truststore} --truststoreType JKS --truststorePasswd ${truststorePasswd} \
+               --keystore ${keystore} --keystoreType JKS --keystorePasswd ${keystorePasswd} --proxiedEntity "admin""
+
+              echo baseUrl ${baseUrl}
+              echo "gracefully disconnecting node '$FQDN' from cluster"
+              ${NIFI_TOOLKIT_HOME}/bin/cli.sh nifi get-nodes -ot json -u ${baseUrl} ${secureArgs} > nodes.json
+              nnid=$(jq --arg FQDN "$FQDN" '.cluster.nodes[] | select(.address==$FQDN) | .nodeId' nodes.json)
+              echo "disconnecting node ${nnid}"
+              ${NIFI_TOOLKIT_HOME}/bin/cli.sh nifi disconnect-node -nnid $nnid -u ${baseUrl} ${secureArgs}
+              echo ""
+              echo "get a connected node"
+              connectedNode=$(jq -r 'first(.cluster.nodes|=sort_by(.address)| .cluster.nodes[] | select(.status=="CONNECTED")) | .address' nodes.json)
+              baseUrl=https://${connectedNode}:
+              echo baseUrl ${baseUrl}
+              echo ""
+              echo "wait until node has state 'DISCONNECTED'"
+              while [[ "${node_state}" != "DISCONNECTED" ]]; do
+                  sleep 1
+                  ${NIFI_TOOLKIT_HOME}/bin/cli.sh nifi get-nodes -ot json -u ${baseUrl} ${secureArgs} > nodes.json
+                  node_state=$(jq -r --arg FQDN "$FQDN" '.cluster.nodes[] | select(.address==$FQDN) | .status' nodes.json)
+                  echo "state is '${node_state}'"
+              done
+              echo ""
+              echo "node '${nnid}' was disconnected"
+              echo "offloading node"
+              ${NIFI_TOOLKIT_HOME}/bin/cli.sh nifi offload-node -nnid $nnid -u ${baseUrl} ${secureArgs}
+              echo ""
+              echo "wait until node has state 'OFFLOADED'"
+              while [[ "${node_state}" != "OFFLOADED" ]]; do
+                  sleep 1
+                  ${NIFI_TOOLKIT_HOME}/bin/cli.sh nifi get-nodes -ot json -u ${baseUrl} ${secureArgs} > nodes.json
+                  node_state=$(jq -r --arg FQDN "$FQDN" '.cluster.nodes[] | select(.address==$FQDN) | .status' nodes.json)
+                  echo "state is '${node_state}'"
+              done
+          }
+
+          deleteNode() {
+              echo "deleting node"
+              ${NIFI_TOOLKIT_HOME}/bin/cli.sh nifi delete-node -nnid ${nnid} -u ${baseUrl} ${secureArgs}
+              echo "node deleted"
+          }
+
+          trap 'echo Received trapped signal, beginning shutdown...;offloadNode;./bin/nifi.sh stop;deleteNode;exit 0;' TERM HUP INT;
+          trap ":" EXIT
+
+          echo NiFi running with PID ${nifi_pid}.
+          wait ${nifi_pid}
+
+          /opt/nifi/nifi-toolkit-current/bin/tls-toolkit.sh standalone \
+            -n '$FQDN' \
+            -C 'admin' \
+            -o '/opt/nifi/nifi-current/conf/' \
+            -P env:PASS  \
+            -S env:PASS  \
+            --nifiPropertiesFile /opt/nifi/nifi-current/conf/nifi.properties
+          exec bin/nifi.sh run
+        env:
+        - name: NIFI_ZOOKEEPER_CONNECT_STRING
+          value: nifi-zookeeper:2181
+        - name: NIFI_SENSITIVE_PROPS_KEY
+          value: "1234567890123456789"
+        image: quay.io/rh-data-services/nifi-openshift:1.16.2
+        imagePullPolicy: Always
+        livenessProbe:
+          initialDelaySeconds: 90
+          periodSeconds: 60
+          tcpSocket:
+            port: 9443
+        name: server
+        ports:
+        - containerPort: 9092
+          name: metrics
+          protocol: TCP
+        - containerPort: 9443
+          name: https
+          protocol: TCP
+        - containerPort: 6007
+          name: cluster
+          protocol: TCP
+        readinessProbe:
+          initialDelaySeconds: 60
+          periodSeconds: 20
+          tcpSocket:
+            port: 9443
+        resources:
+          limits:
+            cpu: 3500m
+            memory: 6Gi
+          requests:
+            cpu: "2"
+            memory: 2Gi
+        volumeMounts:
+        - mountPath: /opt/nifi/hostconf
+          name: hostconf
+        - mountPath: /opt/nifi/data
+          name: data
+        - mountPath: /opt/nifi/nifi-current/auth-conf/
+          name: auth-conf
+        - mountPath: /opt/nifi/nifi-current/config-data
+          name: config-data
+        - mountPath: /opt/nifi/flowfile_repository
+          name: flowfile-repository
+        - mountPath: /opt/nifi/content_repository
+          name: content-repository
+        - mountPath: /opt/nifi/provenance_repository
+          name: provenance-repository
+        - mountPath: /opt/nifi/nifi-current/logs
+          name: logs
+        - mountPath: /opt/nifi/nifi-current/conf/bootstrap.conf
+          name: bootstrap-conf
+          subPath: bootstrap.conf
+        - mountPath: /opt/nifi/nifi-current/conf/nifi.temp
+          name: nifi-properties
+          subPath: nifi.temp
+        - mountPath: /opt/nifi/nifi-current/conf/authorizers.temp
+          name: authorizers-temp
+          subPath: authorizers.temp
+        - mountPath: /opt/nifi/nifi-current/conf/authorizers.empty
+          name: authorizers-empty
+          subPath: authorizers.empty
+        - mountPath: /opt/nifi/nifi-current/conf/bootstrap-notification-services.xml
+          name: bootstrap-notification-services-xml
+          subPath: bootstrap-notification-services.xml
+        - mountPath: /opt/nifi/nifi-current/conf/login-identity-providers.temp
+          name: login-identity-providers-temp
+          subPath: login-identity-providers.temp
+        - mountPath: /opt/nifi/nifi-current/conf/state-management.xml
+          name: state-management-xml
+          subPath: state-management.xml
+        - mountPath: /opt/nifi/nifi-current/conf/zookeeper.properties
+          name: zookeeper-properties
+          subPath: zookeeper.properties
+        - mountPath: /opt/nifi/data/flow.xml
+          name: flow-content
+          subPath: flow.xml
+      - args:
+        - tail
+        - -n+1
+        - -F
+        - /var/log/nifi-app.log
+        image: busybox:1.35.0
+        imagePullPolicy: IfNotPresent
+        name: app-log
+        resources:
+          limits:
+            cpu: 50m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        volumeMounts:
+        - mountPath: /var/log
+          name: logs
+      - args:
+        - tail
+        - -n+1
+        - -F
+        - /var/log/nifi-bootstrap.log
+        image: busybox:1.35.0
+        imagePullPolicy: IfNotPresent
+        name: bootstrap-log
+        resources:
+          limits:
+            cpu: 50m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        volumeMounts:
+        - mountPath: /var/log
+          name: logs
+      - args:
+        - tail
+        - -n+1
+        - -F
+        - /var/log/nifi-user.log
+        image: busybox:1.35.0
+        imagePullPolicy: IfNotPresent
+        name: user-log
+        resources:
+          limits:
+            cpu: 50m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        volumeMounts:
+        - mountPath: /var/log
+          name: logs
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - |
+          echo trying to contact nifi-zookeeper 2181
+          until nc -vzw 1 nifi-zookeeper 2181; do
+            echo "waiting for zookeeper..."
+            sleep 2
+          done
+        image: busybox:1.35.0
+        imagePullPolicy: IfNotPresent
+        name: zookeeper
+      - command:
+        - sh
+        - -c
+        - |
+          echo trying to contact registry
+          until nc -vzw 1 nifi-registry 18080; do
+            echo "waiting for registry..."
+            sleep 2
+          done
+        image: busybox:1.35.0
+        imagePullPolicy: IfNotPresent
+        name: registry
+      - command:
+        - bash
+        - -c
+        - |
+          CA_ADDRESS="nifi-ca:9090"
+          until echo "" | timeout 2 openssl s_client -connect "${CA_ADDRESS}"; do
+            # Checking if ca server using nifi-toolkit is up
+            echo "Waiting for CA to be available at ${CA_ADDRESS}"
+            sleep 2
+          done;
+
+          cd /data/config-data
+          rm -rf certs
+          mkdir certs
+          cd certs
+
+          # Generate certificate for server with webProxyHost or service name as alternate names to access nifi web ui
+          cat <<EOF >>config.json
+          {
+            "dn" : "CN=$(hostname -f), OU=NIFI",
+            "keyStore" : "keystore.jks",
+            "keyStoreType" : "jks",
+            "keyStorePassword" : "trustmaster",
+            "keyPassword" : "trustmaster",
+            "token" : "sixteenCharacters",
+            "caHostname" : "nifi-ca",
+            "port" : 9090,
+            "dnPrefix" : "CN=",
+            "dnSuffix" : ", OU=NIFI",
+            "domainAlternativeNames" : [ "nifi.nifi.svc" ],
+            "trustStore" : "truststore.jks",
+            "trustStorePassword" : "trustmaster",
+            "trustStoreType" : "jks"
+          }
+          EOF
+
+          ${NIFI_TOOLKIT_HOME}/bin/tls-toolkit.sh client --configJsonIn config.json
+
+          # Generate client certificate for browser with webProxyHost or service name as alternate names to access nifi web ui
+          mkdir -p /data/config-data/certs/admin
+          cd /data/config-data/certs/admin
+
+          cat <<EOF >>config.json
+          {
+            "dn" : "CN=admin, OU=NIFI",
+            "keyStore" : "keystore.pkcs12",
+            "keyStoreType" : "pkcs12",
+            "keyStorePassword" : "trustmaster",
+            "keyPassword" : "trustmaster",
+            "token" : "sixteenCharacters",
+            "caHostname" : "nifi-ca",
+            "port" : 9090,
+            "dnPrefix" : "CN=",
+            "dnSuffix" : ", OU=NIFI",
+            "domainAlternativeNames" : [ "nifi.nifi.svc" ],
+            "trustStore" : "truststore.jks",
+            "trustStorePassword" : "trustmaster",
+            "trustStoreType" : "jks"
+          }
+          EOF
+
+          ${NIFI_TOOLKIT_HOME}/bin/tls-toolkit.sh client --configJsonIn config.json
+
+          export PASS=$(jq -r .keyStorePassword config.json)
+
+          openssl pkcs12 -in "keystore.pkcs12" -out "key.pem" -nocerts -nodes -password "env:PASS"
+          openssl pkcs12 -in "keystore.pkcs12" -out "crt.pem" -clcerts -nokeys -password "env:PASS"
+          openssl pkcs12 -in "keystore.pkcs12" -out "keystore.jks" -clcerts -nokeys -password "env:PASS"
+        image: quay.io/rh-data-services/nifi-toolkit-openshift:1.16.2
+        imagePullPolicy: IfNotPresent
+        name: cert-request
+        volumeMounts:
+        - mountPath: /data/config-data
+          name: config-data
+      - command:
+        - bash
+        - -c
+        - |
+          set -x
+          cat <<EOF > /tmp/nifi_route.yaml
+          apiVersion: route.openshift.io/v1
+          kind: Route
+          metadata:
+            name: ${ROUTE_NAME}
+          spec:
+            port:
+              targetPort: https
+            tls:
+              termination: Reencrypt
+              insecureEdgeTerminationPolicy: Redirect
+              destinationCACertificate: |-
+          $(sed 's/^/      /' ${CA_CERT_PATH})
+            to:
+              kind: Service
+              name: ${SERVICE_NAME}
+              weight: 100
+            wildcardPolicy: None
+          EOF
+          oc apply -n ${ROUTE_NAMESPACE} -f /tmp/nifi_route.yaml
+          ROUTE_HOSTNAME=$(oc get route/${ROUTE_NAME} -n ${ROUTE_NAMESPACE} -o jsonpath="{.spec.host}")
+          echo ${ROUTE_HOSTNAME} > /opt/nifi/hostconf/hostname
+        env:
+        - name: SERVICE_NAME
+          value: nifi
+        - name: ROUTE_NAME
+          value: nifi
+        - name: ROUTE_NAMESPACE
+          value: nifi
+        - name: CA_CERT_PATH
+          value: /data/config-data/certs/nifi-cert.pem
+        image: quay.io/openshift/origin-cli:4.10.0
+        imagePullPolicy: IfNotPresent
+        name: reencrypt-route
+        volumeMounts:
+        - mountPath: /data/config-data
+          name: config-data
+        - mountPath: /opt/nifi/hostconf
+          name: hostconf
+      serviceAccountName: nifi-sa
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          items:
+          - key: bootstrap.conf
+            path: bootstrap.conf
+          name: nifi-config
+        name: bootstrap-conf
+      - configMap:
+          items:
+          - key: nifi.properties
+            path: nifi.temp
+          name: nifi-config
+        name: nifi-properties
+      - configMap:
+          items:
+          - key: authorizers.xml
+            path: authorizers.temp
+          name: nifi-config
+        name: authorizers-temp
+      - configMap:
+          items:
+          - key: authorizers-empty.xml
+            path: authorizers.empty
+          name: nifi-config
+        name: authorizers-empty
+      - configMap:
+          items:
+          - key: bootstrap-notification-services.xml
+            path: bootstrap-notification-services.xml
+          name: nifi-config
+        name: bootstrap-notification-services-xml
+      - configMap:
+          items:
+          - key: login-identity-providers.xml
+            path: login-identity-providers.temp
+          name: nifi-config
+        name: login-identity-providers-temp
+      - configMap:
+          items:
+          - key: state-management.xml
+            path: state-management.xml
+          name: nifi-config
+        name: state-management-xml
+      - configMap:
+          items:
+          - key: zookeeper.properties
+            path: zookeeper.properties
+          name: nifi-config
+        name: zookeeper-properties
+      - configMap:
+          items:
+          - key: flow.xml
+            path: flow.xml
+          name: nifi-config
+        name: flow-content
+      - emptyDir:
+          medium: Memory
+        name: hostconf
+  volumeClaimTemplates:
+  - metadata:
+      labels:
+        component.opendatahub.io/name: nifi
+        opendatahub.io/component: "true"
+      name: config-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+      storageClassName: ocs-storagecluster-ceph-rbd
+  - metadata:
+      labels:
+        component.opendatahub.io/name: nifi
+        opendatahub.io/component: "true"
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: ocs-storagecluster-ceph-rbd
+  - metadata:
+      labels:
+        component.opendatahub.io/name: nifi
+        opendatahub.io/component: "true"
+      name: flowfile-repository
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: ocs-storagecluster-ceph-rbd
+  - metadata:
+      labels:
+        component.opendatahub.io/name: nifi
+        opendatahub.io/component: "true"
+      name: content-repository
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: ocs-storagecluster-ceph-rbd
+  - metadata:
+      labels:
+        component.opendatahub.io/name: nifi
+        opendatahub.io/component: "true"
+      name: provenance-repository
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: ocs-storagecluster-ceph-rbd
+  - metadata:
+      labels:
+        component.opendatahub.io/name: nifi
+        opendatahub.io/component: "true"
+      name: logs
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+      storageClassName: ocs-storagecluster-ceph-rbd
+  - metadata:
+      labels:
+        component.opendatahub.io/name: nifi
+        opendatahub.io/component: "true"
+      name: auth-conf
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+      storageClassName: ocs-storagecluster-ceph-rbd
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/instance: nifi
+    app.kubernetes.io/name: registry
+    app.kubernetes.io/version: 1.15.2
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi-registry
+  namespace: nifi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: nifi
+      app.kubernetes.io/name: registry
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+  serviceName: nifi-registry
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: nifi
+        app.kubernetes.io/name: registry
+        component.opendatahub.io/name: nifi
+        opendatahub.io/component: "true"
+    spec:
+      containers:
+      - command:
+        - bash
+        - -ce
+        - |
+          NIFI_REGISTRY_WEB_HTTP_HOST=$(hostname -i) && ${NIFI_REGISTRY_BASE_DIR}/scripts/start.sh
+        image: quay.io/rh-data-services/nifi-registry-openshift:1.16.2
+        imagePullPolicy: IfNotPresent
+        name: registry
+        ports:
+        - containerPort: 18080
+          name: http
+          protocol: TCP
+        resources: {}
+        securityContext: {}
+        volumeMounts:
+        - mountPath: /opt/nifi-registry/nifi-registry-current/database
+          name: database
+        - mountPath: /opt/nifi-registry/nifi-registry-current/flow_storage
+          name: flow-storage
+          subPath: flow_storage
+      securityContext: {}
+      serviceAccountName: nifi-registry
+      volumes: null
+  volumeClaimTemplates:
+  - metadata:
+      labels:
+        component.opendatahub.io/name: nifi
+        opendatahub.io/component: "true"
+      name: database
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: ocs-storagecluster-ceph-rbd
+  - metadata:
+      labels:
+        component.opendatahub.io/name: nifi
+        opendatahub.io/component: "true"
+      name: flow-storage
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: ocs-storagecluster-ceph-rbd
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/component: zookeeper
+    app.kubernetes.io/instance: nifi
+    app.kubernetes.io/name: zookeeper
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+    role: zookeeper
+  name: nifi-zookeeper
+  namespace: nifi
+spec:
+  podManagementPolicy: Parallel
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: zookeeper
+      app.kubernetes.io/instance: nifi
+      app.kubernetes.io/name: zookeeper
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
+  serviceName: nifi-zookeeper-headless
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: zookeeper
+        app.kubernetes.io/instance: nifi
+        app.kubernetes.io/name: zookeeper
+        component.opendatahub.io/name: nifi
+        opendatahub.io/component: "true"
+      name: nifi-zookeeper
+    spec:
+      containers:
+      - command:
+        - bash
+        - -ec
+        - |
+          # Execute entrypoint as usual after obtaining ZOO_SERVER_ID based on POD hostname
+          HOSTNAME=`hostname -s`
+          if [[ $HOSTNAME =~ (.*)-([0-9]+)$ ]]; then
+            ORD=${BASH_REMATCH[2]}
+            export ZOO_SERVER_ID=$((ORD+1))
+          else
+            echo "Failed to get index from hostname $HOST"
+            exit 1
+          fi
+          exec /entrypoint.sh /run.sh
+        env:
+        - name: ZOO_DATA_LOG_DIR
+          value: ""
+        - name: ZOO_PORT_NUMBER
+          value: "2181"
+        - name: ZOO_TICK_TIME
+          value: "2000"
+        - name: ZOO_INIT_LIMIT
+          value: "10"
+        - name: ZOO_SYNC_LIMIT
+          value: "5"
+        - name: ZOO_MAX_CLIENT_CNXNS
+          value: "60"
+        - name: ZOO_4LW_COMMANDS_WHITELIST
+          value: srvr, mntr, ruok
+        - name: ZOO_LISTEN_ALLIPS_ENABLED
+          value: "no"
+        - name: ZOO_AUTOPURGE_INTERVAL
+          value: "0"
+        - name: ZOO_AUTOPURGE_RETAIN_COUNT
+          value: "3"
+        - name: ZOO_MAX_SESSION_TIMEOUT
+          value: "40000"
+        - name: ZOO_SERVERS
+          value: nifi-zookeeper-0.nifi-zookeeper-headless.nifi.svc.cluster.local:2888:3888
+            nifi-zookeeper-1.nifi-zookeeper-headless.nifi.svc.cluster.local:2888:3888
+            nifi-zookeeper-2.nifi-zookeeper-headless.nifi.svc.cluster.local:2888:3888
+        - name: ZOO_ENABLE_AUTH
+          value: "no"
+        - name: ZOO_HEAP_SIZE
+          value: "1024"
+        - name: ZOO_LOG_LEVEL
+          value: ERROR
+        - name: ALLOW_ANONYMOUS_LOGIN
+          value: "yes"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        image: bitnami/zookeeper:3.7.1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - echo "ruok" | timeout 2 nc -w 2 localhost 2181 | grep imok
+          failureThreshold: 6
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: zookeeper
+        ports:
+        - containerPort: 2181
+          name: client
+        - containerPort: 2888
+          name: follower
+        - containerPort: 3888
+          name: election
+        readinessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - echo "ruok" | timeout 2 nc -w 2 localhost 2181 | grep imok
+          failureThreshold: 6
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+        volumeMounts:
+        - mountPath: /bitnami/zookeeper
+          name: data
+      securityContext: {}
+      serviceAccountName: nifi-sa
+      volumes: null
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      annotations: null
+      labels:
+        component.opendatahub.io/name: nifi
+        opendatahub.io/component: "true"
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 8Gi
+      storageClassName: ocs-storagecluster-ceph-rbd
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app.kubernetes.io/component: zookeeper
+    app.kubernetes.io/instance: nifi
+    app.kubernetes.io/name: zookeeper
+    component.opendatahub.io/name: nifi
+    opendatahub.io/component: "true"
+  name: nifi-zookeeper
+  namespace: nifi
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: zookeeper
+      app.kubernetes.io/instance: nifi
+      app.kubernetes.io/name: zookeeper
+      component.opendatahub.io/name: nifi
+      opendatahub.io/component: "true"
